@@ -20,6 +20,7 @@ const SignInPage = () => {
         localStorage.setItem('authToken', response.data.token);
         navigate('/customize'); 
       }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       setError('Invalid email or password');
     }

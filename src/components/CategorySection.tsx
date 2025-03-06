@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import UrlIcon from "../assets/Cetagory/url.svg";
 import PdfIcon from "../assets/Cetagory/pdf.svg";
 import ImageIcon from "../assets/Cetagory/img.svg";
@@ -19,6 +20,7 @@ import FormsIcon from "../assets/Cetagory/form.svg";
 import TwitterIcon from "../assets/Cetagory/x.svg";
 
 const CategorySection = () => {
+    const navigate = useNavigate();
 
     const categories = [
         { id: 1, name: "URL", icon: UrlIcon },
@@ -42,6 +44,12 @@ const CategorySection = () => {
         { id: 24, name: "X (Twitter)", icon: TwitterIcon },
     ];
 
+    const handleCategoryClick = (id: number) => {
+        if (id === 3) {
+            navigate("/upload-page");
+        }
+    };
+
     return (
         <section className="py-16 bg-gray-50 text-center">
             {/* Title */}
@@ -57,7 +65,8 @@ const CategorySection = () => {
                 {categories.map((category) => (
                     <div
                         key={category.id}
-                        className="flex flex-col items-center bg-white shadow-md rounded-lg p-4 hover:shadow-lg transition"
+                        className="flex flex-col items-center bg-white shadow-md rounded-lg p-4 hover:shadow-lg transition cursor-pointer"
+                        onClick={() => handleCategoryClick(category.id)}
                     >
                         <img src={category.icon} alt={category.name} className="w-10 h-10" />
                         <p className="mt-2 text-gray-700 font-medium text-sm">{category.name}</p>
