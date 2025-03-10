@@ -19,21 +19,23 @@ const UploadPage = () => {
       alert("Please select a file to upload");
       return;
     }
-
+  
     const token = localStorage.getItem("token");
     if (!token) {
-      navigate("/sign-in", { state: { qrName, file } });
+      // Store file details before navigating to login
+      localStorage.setItem("pendingFile", JSON.stringify({ qrName }));
+      navigate("/sign-in");
       return;
     }
-
+  
     const formData = new FormData();
     formData.append("file", file);
-
+  
     try {
       const response = await axios.post("http://localhost:5000/upload", formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
+  
       const fileUrl = response.data.fileUrl;
       navigate(`/customize?qrName=${encodeURIComponent(qrName)}&fileUrl=${encodeURIComponent(fileUrl)}`);
     } catch (error) {
@@ -41,6 +43,7 @@ const UploadPage = () => {
       alert("File upload failed");
     }
   };
+  
 
   return (
     <div className="flex flex-col items-center p-8 bg-gray-50 min-h-screen">

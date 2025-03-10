@@ -6,23 +6,32 @@ const SignInPage = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError] = useState(''); // ✅ Fix: Make error state updatable
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
+    e.preventDefault(); // ✅ Fix: Prevent form reload
 
     try {
-      const response = await axios.post('http://localhost:5000/api/users/login', { email, password });
+      const response = await axios.post("http://localhost:5000/api/users/login", {
+        email,
+        password,
+      });
 
-      if (response.status === 200) {
-        // Store the token or user data in local storage or state
-        localStorage.setItem('authToken', response.data.token);
-        navigate('/customize'); 
+      const { token, userId } = response.data;
+      localStorage.setItem("token", token);
+      localStorage.setItem("userId", userId);
+
+      // Check if there was a pending file upload
+      const pendingFile = localStorage.getItem("pendingFile");
+      if (pendingFile) {
+        localStorage.removeItem("pendingFile");
+        navigate("/upload-page");
+      } else {
+        navigate("/dashboard");
       }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (err) {
-      setError('Invalid email or password');
+    } catch (error) {
+      console.error("Login failed:", error);
+      setError("Invalid email or password"); // ✅ Fix: Show error message
     }
   };
 
@@ -37,7 +46,7 @@ const SignInPage = () => {
 
         {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
 
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleLogin} className="space-y-4"> {/* ✅ Fix: Prevent reload */}
           <div>
             <label className="block text-gray-700">Email</label>
             <input
