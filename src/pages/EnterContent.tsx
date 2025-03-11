@@ -14,7 +14,8 @@ const EnterContent = () => {
       alert("Please enter a valid URL");
       return;
     }
-    navigate(`/customize?url=${encodeURIComponent(link)}`);
+    // Navigate to the Customize page and pass the URL as a query parameter
+    navigate(`/customize?fileUrl=${encodeURIComponent(link)}`);
   };
 
   return (
@@ -24,22 +25,6 @@ const EnterContent = () => {
           <FaArrowLeft /> Back
         </button>
         <h2 className="text-xl font-semibold text-center">Enter Content</h2>
-        <div className="w-full h-1 bg-purple-300 mt-4">
-          <div className="h-full bg-purple-600 w-1/5"></div>
-        </div>
-
-        <div className="flex flex-wrap gap-2 mt-4 justify-center">
-          {["URL / Link", "Play Market / App Store", "Text", "Map", "Wi-Fi", "Audio", "PDF", "WhatsApp"].map(
-            (item, index) => (
-              <button
-                key={index}
-                className={`px-4 py-2 rounded ${index === 0 ? "bg-purple-600 text-white" : "border"}`}
-              >
-                {item}
-              </button>
-            )
-          )}
-        </div>
 
         <div className="mt-6 bg-gray-100 p-6 rounded-md">
           <label className="block text-gray-700 text-sm mb-1">Put your link here</label>

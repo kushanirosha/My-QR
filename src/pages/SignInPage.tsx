@@ -6,16 +6,32 @@ const SignInPage = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState(''); // ✅ Fix: Make error state updatable
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false); // ✅ Add loading state
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault(); // ✅ Fix: Prevent form reload
+    e.preventDefault();
 
+    // Basic validation
+    if (!email || !password) {
+      setError('Email and password are required');
+      return;
+    }
+
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
+    setLoading(true); // ✅ Show loading spinner while logging in
     try {
-      const response = await axios.post("http://localhost:5000/api/users/login", {
-        email,
-        password,
-      });
+      const response = await axios.post(
+        "http://localhost:5000/api/users/login",
+        { email, password },
+        { headers: { "Content-Type": "application/json" } }
+      );      
+      
+console.log(response);
 
       const { token, userId } = response.data;
       localStorage.setItem("token", token);
@@ -27,11 +43,13 @@ const SignInPage = () => {
         localStorage.removeItem("pendingFile");
         navigate("/upload-page");
       } else {
-        navigate("/dashboard");
+        navigate("/customize");
       }
     } catch (error) {
       console.error("Login failed:", error);
-      setError("Invalid email or password"); // ✅ Fix: Show error message
+      setError("Invalid email or password");
+    } finally {
+      setLoading(false); // ✅ Hide loading spinner after login attempt
     }
   };
 
@@ -46,7 +64,7 @@ const SignInPage = () => {
 
         {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
 
-        <form onSubmit={handleLogin} className="space-y-4"> {/* ✅ Fix: Prevent reload */}
+        <form onSubmit={handleLogin} className="space-y-4">
           <div>
             <label className="block text-gray-700">Email</label>
             <input
@@ -72,8 +90,9 @@ const SignInPage = () => {
           <button
             type="submit"
             className="w-full bg-purple-600 text-white px-5 py-2 rounded-md hover:bg-purple-700"
+            disabled={loading} // ✅ Disable button while loading
           >
-            Sign In
+            {loading ? 'Signing In...' : 'Sign In'}  {/* ✅ Show loading text */}
           </button>
         </form>
 
