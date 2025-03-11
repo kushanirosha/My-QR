@@ -1,18 +1,19 @@
-import { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useAuth } from '../providers/AuthContext';
 
 const SignInPage = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false); // ✅ Add loading state
+  const { setUser } = useAuth();
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [error, setError] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Basic validation
     if (!email || !password) {
       setError('Email and password are required');
       return;
@@ -23,33 +24,33 @@ const SignInPage = () => {
       return;
     }
 
-    setLoading(true); // ✅ Show loading spinner while logging in
+    setLoading(true);
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/users/login",
+      const response = await axios.post<{ token: string; userId: string; name: string; email: string }>(
+        'http://localhost:5000/api/users/login',
         { email, password },
-        { headers: { "Content-Type": "application/json" } }
-      );      
-      
-console.log(response);
+        { headers: { 'Content-Type': 'application/json' } }
+      );
 
-      const { token, userId } = response.data;
-      localStorage.setItem("token", token);
-      localStorage.setItem("userId", userId);
+      const { token, userId, name, email: userEmail } = response.data;
+      localStorage.setItem('token', token);
+      localStorage.setItem('userId', userId);
 
-      // Check if there was a pending file upload
-      const pendingFile = localStorage.getItem("pendingFile");
+      // Set user in context
+      setUser({ name, email: userEmail, id: userId });
+
+      const pendingFile = localStorage.getItem('pendingFile');
       if (pendingFile) {
-        localStorage.removeItem("pendingFile");
-        navigate("/upload-page");
+        localStorage.removeItem('pendingFile');
+        navigate('/customize');
       } else {
-        navigate("/customize");
+        navigate('/');
       }
     } catch (error) {
-      console.error("Login failed:", error);
-      setError("Invalid email or password");
+      console.error('Login failed:', error);
+      setError('Invalid email or password');
     } finally {
-      setLoading(false); // ✅ Hide loading spinner after login attempt
+      setLoading(false);
     }
   };
 
@@ -90,9 +91,9 @@ console.log(response);
           <button
             type="submit"
             className="w-full bg-purple-600 text-white px-5 py-2 rounded-md hover:bg-purple-700"
-            disabled={loading} // ✅ Disable button while loading
+            disabled={loading}
           >
-            {loading ? 'Signing In...' : 'Sign In'}  {/* ✅ Show loading text */}
+            {loading ? 'Signing In...' : 'Sign In'}
           </button>
         </form>
 
