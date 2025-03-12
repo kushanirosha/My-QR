@@ -1,14 +1,12 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import axios from 'axios';
 
-// Define the shape of the user object
 interface User {
   name: string;
   email: string;
-  id: string; // Assuming userId is a string
+  id: string;
 }
 
-// Define the shape of the context value
 interface AuthContextValue {
   user: User | null;
   setUser: (user: User | null) => void;
@@ -16,26 +14,31 @@ interface AuthContextValue {
   logout: () => void;
 }
 
-// Create the context with a default value
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-// AuthProvider component
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Check if the user is logged in on app load
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem('token');
       if (token) {
         try {
-          const response = await axios.get<{ data: User }>('http://localhost:5000/api/users/me', {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          setUser(response.data.data); // Assuming backend wraps user data in { data: { ... } }
+          const response = await axios.get<{ user: { id: string; name: string; email: string } }>(
+            'http://localhost:5000/api/users/me',
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          const { user: userData } = response.data;
+          if (userData) {
+            setUser(userData);
+          } else {
+            throw new Error("Invalid user data in response");
+          }
         } catch (error) {
           console.error('Failed to fetch user data:', error);
           localStorage.removeItem('token');
@@ -48,7 +51,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     checkAuth();
   }, []);
 
-  // Function to log out the user
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
@@ -62,7 +64,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// Custom hook to use the AuthContext
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -70,3 +71,5 @@ export const useAuth = () => {
   }
   return context;
 };
+
+export default AuthContext;

@@ -6,7 +6,6 @@ const EnterContent = () => {
   const [link, setLink] = useState("");
   const [qrName, setQrName] = useState("");
   const [category, setCategory] = useState("");
-
   const navigate = useNavigate();
 
   const handleCustomize = () => {
@@ -14,14 +13,19 @@ const EnterContent = () => {
       alert("Please enter a valid URL");
       return;
     }
-    // Navigate to the Customize page and pass the URL as a query parameter
-    navigate(`/customize?fileUrl=${encodeURIComponent(link)}`);
+    // Navigate to the Customize page with URL, QR name, and category as query parameters
+    navigate(
+      `/customize?fileUrl=${encodeURIComponent(link)}&qrName=${encodeURIComponent(qrName)}&category=${encodeURIComponent(category)}`
+    );
   };
 
   return (
     <div className="flex flex-col items-center p-8 bg-gray-50 min-h-screen">
       <div className="w-full max-w-4xl bg-white p-6 rounded-lg shadow-md mt-16">
-        <button className="mb-4 flex items-center gap-2 border px-4 py-2 rounded">
+        <button
+          className="mb-4 flex items-center gap-2 border px-4 py-2 rounded"
+          onClick={() => navigate(-1)}
+        >
           <FaArrowLeft /> Back
         </button>
         <h2 className="text-xl font-semibold text-center">Enter Content</h2>

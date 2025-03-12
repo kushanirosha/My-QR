@@ -6,6 +6,7 @@ import Customize from "../pages/CustomizeQR";
 import SignInPage from "../pages/SignInPage";
 import CreateAccountPage from "../pages/CreateAccountPage";
 import UploadPage from "../pages/Upload";
+import Dashboard from "../pages/Dashboard";
 
 const RoutesComponent = () => {
     return (
@@ -19,6 +20,7 @@ const RoutesComponent = () => {
                     <Route path="/sign-in" element={<SignInPage />} />
                     <Route path="/create-account" element={<CreateAccountPage />} />
                     <Route path="/upload-page" element={<UploadPage/>}/>
+                    <Route path="/dashboard" element={<Dashboard />} />
                 </Routes>
             </div>
         </>

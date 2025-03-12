@@ -1,17 +1,25 @@
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../providers/AuthContext';
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../providers/AuthContext";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
 
   const handleSignInClick = () => {
-    navigate('/sign-in');
+    navigate("/sign-in");
   };
 
   const handleLogoutClick = () => {
     logout();
-    navigate('/');
+    navigate("/");
+  };
+
+  const handleDashboardClick = () => {
+    if (user) {
+      navigate("/dashboard");
+    } else {
+      navigate("/sign-in");
+    }
   };
 
   return (
@@ -27,7 +35,12 @@ const Navbar = () => {
       </div>
       {user ? (
         <div className="flex items-center space-x-4">
-          <span className="text-gray-700">Welcome, {user.name}</span>
+          <span
+            onClick={handleDashboardClick}
+            className="text-gray-700 cursor-pointer hover:text-purple-600"
+          >
+            👤 {user.name} (Dashboard)
+          </span>
           <button
             className="bg-purple-600 text-white px-5 py-2 rounded-md hover:bg-purple-700"
             onClick={handleLogoutClick}
