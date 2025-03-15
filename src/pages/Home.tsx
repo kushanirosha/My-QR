@@ -3,6 +3,12 @@ import Step1 from "../assets/Steps/step-1.svg";
 import Step2 from "../assets/Steps/step-2.svg";
 import Step3 from "../assets/Steps/step-3.svg";
 import CategorySection from "../components/CategorySection";
+import Statistics from "../components/Statistics";
+import FramesCarousel from "../components/FramesCarousel";
+import Features from "../components/Features";
+import METicket from "../components/METicket";
+import MEQRReviews from "../components/MEQRReviews";
+import QRCodesForCulture from "../components/QRCodesForCulture";
 
 
 const Home = () => {
@@ -89,6 +95,24 @@ const Home = () => {
 
             {/* Category Section */}
             <CategorySection />
+
+            {/* Statistics Section */}
+            <Statistics/>
+
+            {/* Frames Carousel */}
+            <FramesCarousel/>
+
+            {/* Features */}
+            <Features/>
+
+            {/* METicket */}
+            <METicket/>
+
+            {/* MEQRReviews */}
+            <MEQRReviews/>
+
+            {/* QRCodesForCulture */}
+            <QRCodesForCulture/>
 
         </>
     );

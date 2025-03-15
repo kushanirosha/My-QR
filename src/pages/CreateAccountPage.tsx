@@ -49,7 +49,7 @@ const CreateAccountPage = () => {
       const pendingImageUrl = localStorage.getItem("pendingImageUrl") || (location.state?.pendingImageUrl);
       if (pendingImageUrl) {
         localStorage.removeItem("pendingImageUrl");
-        navigate(`/customize?fileUrl=${encodeURIComponent(pendingImageUrl)}`);
+        navigate("/dashboard");
       } else {
         navigate("/");
       }

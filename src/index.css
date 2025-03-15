@@ -1,1 +1,25 @@
 @import "tailwindcss";
+
+
+/* Custom animation for horizontal scrolling */
+@keyframes scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+  
+  .animate-scroll {
+    display: flex;
+    width: 200%; /* Double the width to accommodate duplicated frames */
+    animation: scroll 15s linear infinite;
+  }
+  
+  /* Ensure seamless loop by resetting transform */
+  .animate-scroll:hover {
+    animation-play-state: paused;
+  }
+
+  

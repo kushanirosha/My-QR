@@ -7,6 +7,7 @@ import SignInPage from "../pages/SignInPage";
 import CreateAccountPage from "../pages/CreateAccountPage";
 import UploadPage from "../pages/Upload";
 import Dashboard from "../pages/Dashboard";
+import Footer from "../layout/Footer";
 
 const RoutesComponent = () => {
     return (
@@ -23,6 +24,7 @@ const RoutesComponent = () => {
                     <Route path="/dashboard" element={<Dashboard />} />
                 </Routes>
             </div>
+           <Footer/>
         </>
     );
 };
