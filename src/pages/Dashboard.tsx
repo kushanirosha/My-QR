@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../providers/AuthContext"; // Adjust the import path
+import { useAuth } from "../providers/AuthContext";
 import axios from "axios";
 
 interface QRCodeData {
@@ -18,7 +18,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
   const fetchQRCodes = async () => {
     if (!user || !user.id) {
@@ -44,10 +44,10 @@ const Dashboard = () => {
           },
         }
       );
+      console.log("Fetched QR codes:", response.data.qrCodes);
       setQRCodes(response.data.qrCodes);
     } catch (err) {
-      const error = err as AxiosError;
-      console.error("Error fetching QR codes:", error);
+      console.error("Error fetching QR codes:", err);
       setError("Failed to fetch QR codes. Please try again.");
     } finally {
       setLoading(false);
@@ -126,7 +126,7 @@ const Dashboard = () => {
                     className="bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700"
                   >
                     Delete
-                </button>
+                  </button>
                 </div>
               </div>
             ))}

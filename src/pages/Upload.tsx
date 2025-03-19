@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
-import { useAuth } from "../providers/AuthContext"; 
+import { useAuth } from "../providers/AuthContext";
 
 const UploadImage = () => {
   const [image, setImage] = useState<File | null>(null);
@@ -26,7 +26,7 @@ const UploadImage = () => {
     if (!user) {
       // Store the image URL in localStorage to retrieve after login or account creation
       localStorage.setItem("pendingImageUrl", imageUrl);
-      navigate("/sign-in", { state: { redirectTo: `/customize?fileUrl=${encodeURIComponent(imageUrl)}` } });
+      navigate("/up-sign-in", { state: { redirectTo: `/customize?fileUrl=${encodeURIComponent(imageUrl)}` } });
       return;
     }
     navigate(`/customize?fileUrl=${encodeURIComponent(imageUrl)}`);

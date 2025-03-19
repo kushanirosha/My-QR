@@ -8,6 +8,8 @@ import CreateAccountPage from "../pages/CreateAccountPage";
 import UploadPage from "../pages/Upload";
 import Dashboard from "../pages/Dashboard";
 import Footer from "../layout/Footer";
+import UPSignInPage from "../pages/UPsignin";
+import UPCreateAccountPage from "../pages/UPcreateaccount";
 
 const RoutesComponent = () => {
     return (
@@ -22,6 +24,8 @@ const RoutesComponent = () => {
                     <Route path="/create-account" element={<CreateAccountPage />} />
                     <Route path="/upload-page" element={<UploadPage/>}/>
                     <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/up-sign-in" element={<UPSignInPage/>} />
+                    <Route path="up-create-account" element={<UPCreateAccountPage/>}/>
                 </Routes>
             </div>
            <Footer/>

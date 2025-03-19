@@ -2,17 +2,8 @@ import { useState, FormEvent } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../providers/AuthContext";
-import QRCode from "qrcode";
 
-interface QRCodeData {
-  fileUrl: string;
-  qrCodeImage: string;
-  qrName?: string;
-  category?: string;
-  frame?: string;
-}
-
-const SignInPage = () => {
+const UPSignInPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -20,51 +11,6 @@ const SignInPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { setUser } = useAuth();
-
-  const applyFrameToQRCode = async (qrCodeImage: string, frameSrc: string) => {
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    if (!ctx) throw new Error("Canvas context not available");
-
-    const qrImage = new Image();
-    const frameImage = new Image();
-
-    canvas.width = 300;
-    canvas.height = 300;
-
-    qrImage.src = qrCodeImage;
-    await new Promise((resolve) => (qrImage.onload = resolve));
-
-    frameImage.src = frameSrc;
-    await new Promise((resolve) => (frameImage.onload = resolve));
-
-    ctx.drawImage(qrImage, 0, 0, 300, 300);
-    ctx.drawImage(frameImage, 0, 0, 300, 300);
-
-    return canvas.toDataURL("image/png");
-  };
-
-  const saveQrCodeToDatabase = async (qrCodeData: QRCodeData, userId: string, token: string) => {
-    try {
-      const response = await axios.post(
-        "http://localhost:5000/api/qrcodes",
-        {
-          userId,
-          qrCodes: [qrCodeData],
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log("QR code saved successfully from SignInPage:", response.data);
-    } catch (error) {
-      console.error("Error saving QR code to database from SignInPage:", error);
-      throw error;
-    }
-  };
 
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -93,42 +39,16 @@ const SignInPage = () => {
       setUser({ id: userData.id, name: userData.name, email: userData.email });
 
       const pendingImageUrl = localStorage.getItem("pendingImageUrl");
-      const pendingFrame = localStorage.getItem("pendingFrame");
       const { state } = location;
 
       console.log("SignIn - Pending image URL:", pendingImageUrl);
-      console.log("SignIn - Pending frame:", pendingFrame);
       console.log("SignIn - Location state:", state);
 
       if (pendingImageUrl) {
-        // Extract qrName and category from the redirectTo state if available
-        const params = new URLSearchParams(state?.redirectTo?.split("?")[1] || "");
-        const qrName = params.get("qrName") || "";
-        const category = params.get("category") || "";
-
-        // Generate QR code
-        let qrCodeImage = await QRCode.toDataURL(pendingImageUrl);
-
-        // Apply frame if it exists
-        if (pendingFrame) {
-          qrCodeImage = await applyFrameToQRCode(qrCodeImage, pendingFrame);
-        }
-
-        const qrCodeData: QRCodeData = {
-          fileUrl: pendingImageUrl,
-          qrCodeImage,
-          qrName,
-          category,
-          frame: pendingFrame || undefined,
-        };
-
-        // Save QR code to database
-        await saveQrCodeToDatabase(qrCodeData, userData.id, token);
-
-        // Clear pendingImageUrl and pendingFrame
-        localStorage.removeItem("pendingImageUrl");
-        localStorage.removeItem("pendingFrame");
-        navigate("/dashboard");
+        // Redirect to customize page instead of saving immediately
+        navigate(`/customize?fileUrl=${encodeURIComponent(pendingImageUrl)}`);
+      } else if (state && state.redirectTo) {
+        navigate(state.redirectTo);
       } else {
         navigate("/"); // Navigate to home if no pending URL
       }
@@ -183,7 +103,7 @@ const SignInPage = () => {
         <p className="text-center mt-4">
           Don't have an account?{" "}
           <button
-            onClick={() => navigate("/create-account", { state: location.state })}
+            onClick={() => navigate("/up-create-account", { state: location.state })}
             className="text-purple-600 hover:underline"
           >
             Create Account
@@ -194,4 +114,4 @@ const SignInPage = () => {
   );
 };
 
-export default SignInPage;
+export default UPSignInPage;
