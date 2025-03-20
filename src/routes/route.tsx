@@ -5,11 +5,12 @@ import EnterContent from "../pages/EnterContent";
 import Customize from "../pages/CustomizeQR";
 import SignInPage from "../pages/SignInPage";
 import CreateAccountPage from "../pages/CreateAccountPage";
-import UploadPage from "../pages/Upload";
+import UploadPage from "../pages/CategoryPages/UploadImage";
 import Dashboard from "../pages/Dashboard";
 import Footer from "../layout/Footer";
 import UPSignInPage from "../pages/UPsignin";
 import UPCreateAccountPage from "../pages/UPcreateaccount";
+import UploadPdf from "../pages/CategoryPages/UploadPdf";
 
 const RoutesComponent = () => {
     return (
@@ -26,6 +27,7 @@ const RoutesComponent = () => {
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/up-sign-in" element={<UPSignInPage/>} />
                     <Route path="up-create-account" element={<UPCreateAccountPage/>}/>
+                    <Route path="/upload-pdf" element={<UploadPdf />} />
                 </Routes>
             </div>
            <Footer/>

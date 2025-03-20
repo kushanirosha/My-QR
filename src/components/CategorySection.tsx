@@ -45,6 +45,13 @@ const CategorySection = () => {
     ];
 
     const handleCategoryClick = (id: number) => {
+
+        if (id === 1) {
+            navigate("/enter-content");
+        }
+        if (id === 2) {
+            navigate("/upload-pdf");
+        }
         if (id === 3) {
             navigate("/upload-page");
         }

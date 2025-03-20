@@ -44,14 +44,91 @@ const UPCreateAccountPage = () => {
       setUser({ id: userData.id, name: userData.name, email: userData.email });
 
       const pendingImageUrl = localStorage.getItem("pendingImageUrl");
+      const pendingPdfFilename = localStorage.getItem("pendingPdfFilename");
 
       console.log("CreateAccount - Pending image URL:", pendingImageUrl);
+      console.log("CreateAccount - Pending PDF filename:", pendingPdfFilename);
       console.log("CreateAccount - Location state:", location.state);
 
+      // Handle pending image upload
       if (pendingImageUrl) {
-        // Redirect to customize page instead of saving immediately
-        navigate(`/customize?fileUrl=${encodeURIComponent(pendingImageUrl)}`);
-      } else {
+        let imageId: string;
+        if (pendingImageUrl.startsWith("blob:")) {
+          const response = await fetch(pendingImageUrl);
+          const blob = await response.blob();
+          const file = new File([blob], "uploaded-image.jpg", { type: blob.type });
+
+          const formData = new FormData();
+          formData.append("image", file);
+
+          try {
+            const uploadResponse = await axios.post("http://localhost:5000/api/images/upload", formData, {
+              headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`,
+              },
+            });
+
+            imageId = uploadResponse.data.imageId;
+          } catch (uploadError) {
+            console.error("Image upload failed:", uploadError);
+            if (uploadError.response) {
+              setError(`Image upload failed: ${uploadError.response.data.message || "Unknown error"}`);
+            } else {
+              setError("Image upload failed: Network error. Please try again later.");
+            }
+            setLoading(false);
+            return;
+          }
+        } else {
+          const urlParams = new URLSearchParams(location.state?.redirectTo?.split("?")[1] || "");
+          imageId = urlParams.get("imageId") || "pending";
+        }
+
+        localStorage.removeItem("pendingImageUrl");
+        navigate(`/customize?imageId=${imageId}`);
+      }
+      // Handle pending PDF upload
+      else if (pendingPdfFilename) {
+        let pdfId: string;
+        const pendingPdfUrl = localStorage.getItem("pendingPdfUrl");
+        if (pendingPdfUrl && pendingPdfUrl.startsWith("blob:")) {
+          const response = await fetch(pendingPdfUrl);
+          const blob = await response.blob();
+          const file = new File([blob], pendingPdfFilename, { type: "application/pdf" });
+
+          const formData = new FormData();
+          formData.append("pdf", file);
+
+          try {
+            const uploadResponse = await axios.post("http://localhost:5000/api/pdfs/upload", formData, {
+              headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`,
+              },
+            });
+
+            pdfId = uploadResponse.data.pdfId;
+          } catch (uploadError) {
+            console.error("PDF upload failed:", uploadError);
+            if (uploadError.response) {
+              setError(`PDF upload failed: ${uploadError.response.data.message || "Unknown error"}`);
+            } else {
+              setError("PDF upload failed: Network error. Please try again later.");
+            }
+            setLoading(false);
+            return;
+          }
+        } else {
+          const urlParams = new URLSearchParams(location.state?.redirectTo?.split("?")[1] || "");
+          pdfId = urlParams.get("pdfId") || "pending";
+        }
+
+        localStorage.removeItem("pendingPdfFilename");
+        localStorage.removeItem("pendingPdfUrl");
+        navigate(`/customize?pdfId=${pdfId}`);
+      }
+      else {
         navigate("/"); // Navigate to home if no pending URL
       }
     } catch (error) {

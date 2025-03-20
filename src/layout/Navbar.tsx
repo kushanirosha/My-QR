@@ -28,7 +28,7 @@ const Navbar = () => {
         <span className="italic">MY</span> <span className="text-purple-600">QR</span>
       </div>
       <div className="hidden md:flex space-x-6 text-gray-700">
-        <a href="#" className="hover:text-purple-600">Create QR</a>
+        <a href="/" className="hover:text-purple-600">Create QR</a>
         <a href="#" className="hover:text-purple-600">Frames</a>
         <a href="#" className="hover:text-purple-600">Ticket QR</a>
         <a href="#" className="hover:text-purple-600">Support</a>

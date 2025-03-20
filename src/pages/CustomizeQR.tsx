@@ -35,7 +35,8 @@ const CustomizeQR = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const params = new URLSearchParams(location.search);
-  const fileUrl = params.get("fileUrl");
+  const imageId = params.get("imageId");
+  const pdfId = params.get("pdfId");
   const qrName = params.get("qrName") || "";
   const category = params.get("category") || "";
 
@@ -46,24 +47,38 @@ const CustomizeQR = () => {
   const [editedQRImage, setEditedQRImage] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!fileUrl) {
-      setError("No file URL provided.");
+    if (!imageId && !pdfId) {
+      setError("No image or PDF ID provided.");
       return;
     }
 
+    // Construct the fileUrl based on whether it's an image or PDF
+    const fileUrl = imageId
+      ? `http://localhost:5000/api/images/image/${imageId}`
+      : `http://localhost:5000/api/pdfs/pdf/${pdfId}`;
+
     if (!qrCode) {
-      QRCode.toDataURL(fileUrl)
+      QRCode.toDataURL(fileUrl, {
+        errorCorrectionLevel: "H",
+      })
         .then((qrCodeImage) => {
           const qrCodeData: QRCodeData = { fileUrl, qrCodeImage, qrName, category };
           setQrCode(qrCodeData);
           setEditedQRImage(qrCodeImage);
+
+          // Check if a pending frame exists (e.g., after login)
+          const pendingFrame = localStorage.getItem("pendingFrame");
+          if (pendingFrame) {
+            setSelectedFrame(pendingFrame);
+            applyFrameToQRCode(pendingFrame);
+          }
         })
         .catch((error) => {
           setError("Error generating QR code.");
           console.error("Error generating QR code:", error);
         });
     }
-  }, [fileUrl, qrName, category, qrCode]);
+  }, [imageId, pdfId, qrName, category, qrCode]);
 
   const applyFrameToQRCode = async (frameSrc: string) => {
     if (!qrCode) return;
@@ -106,7 +121,7 @@ const CustomizeQR = () => {
       console.log("Token being sent:", token);
       if (!token) {
         setError("Please log in to save the QR code.");
-        navigate("/sign-in", { state: { redirectTo: location.pathname + location.search } });
+        navigate("/up-sign-in", { state: { redirectTo: location.pathname + location.search } });
         return;
       }
       const response = await axios.post(
@@ -140,7 +155,7 @@ const CustomizeQR = () => {
     if (!user) {
       // If user is not logged in, navigate to login page
       localStorage.setItem("pendingImageUrl", qrCode.fileUrl);
-      navigate("/sign-in", { state: { redirectTo: location.pathname + location.search } });
+      navigate("/up-sign-in", { state: { redirectTo: location.pathname + location.search } });
       return;
     }
 
@@ -170,6 +185,46 @@ const CustomizeQR = () => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+    }
+  };
+
+  const handleViewContent = async () => {
+    if (!qrCode?.fileUrl) {
+      setError("No file URL available to view content.");
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("Please log in to view the content.");
+      navigate("/up-sign-in", { state: { redirectTo: location.pathname + location.search } });
+      return;
+    }
+
+    try {
+      const response = await axios.get(qrCode.fileUrl, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        responseType: "blob", // Expect a binary response (image or PDF)
+      });
+
+      // Create a temporary URL for the blob
+      const blob = new Blob([response.data], { type: response.headers["content-type"] });
+      const url = URL.createObjectURL(blob);
+
+      // Open the content in a new tab
+      window.open(url, "_blank");
+
+      // Revoke the object URL after some time to free memory
+      setTimeout(() => URL.revokeObjectURL(url), 60000); // Revoke after 60 seconds
+    } catch (error) {
+      console.error("Error fetching content:", error);
+      if (error.response) {
+        setError(`Failed to view content: ${error.response.data.message || "Unknown error"}`);
+      } else {
+        setError("Failed to view content: Network error. Please try again later.");
+      }
     }
   };
 
@@ -239,14 +294,12 @@ const CustomizeQR = () => {
           ) : editedQRImage ? (
             <div className="mt-6 flex flex-col items-center">
               <img src={editedQRImage} alt="QR Code" className="w-48 h-48" />
-              <a
-                href={qrCode?.fileUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={handleViewContent}
                 className="mt-4 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-md"
               >
                 View Content
-              </a>
+              </button>
               <div className="mt-4 flex space-x-4">
                 <button
                   onClick={downloadQRCode}
